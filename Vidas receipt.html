@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فيداس — نظام إصدار الفواتير</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="loginModal" class="login-overlay">
+  <div class="login-box">
+    <div class="modal-header">
+      <button id="showLoginTab" class="tab-btn active">تسجيل الدخول</button>
+      <button id="showRegisterTab" class="tab-btn">إضافة حساب جديد</button>
+    </div>
+
+    <div id="loginSection">
+      <div class="field">
+        <label>اسم المستخدم</label>
+        <input type="text" id="loginUser" placeholder="اسم المستخدم">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="كلمة المرور">
+      </div>
+      <button class="btn btn-primary" id="loginBtn">دخول</button>
+      <div id="loginErr" class="msg-err">بيانات الدخول غير صحيحة</div>
+    </div>
+
+    <div id="registerSection" style="display:none;">
+      <div class="field">
+        <label>اسم المستخدم الجديد</label>
+        <input type="text" id="regUser" placeholder="الاسم">
+      </div>
+      <div class="field">
+        <label>رمز التحقيق</label>
+        <input type="password" id="regAdminPass" placeholder="رمز التحقيق">
+      </div>
+      <button class="btn btn-primary" id="regBtn">إنشاء حساب</button>
+      <div id="regMsg" class="msg-box"></div>
+    </div>
+  </div>
+</div>
+
+<div id="savedModal" class="login-overlay" style="display:none;">
+  <div class="login-box modal-wide">
+    <div class="modal-top">
+      <h3>الفواتير المحفوظة تفصيلياً</h3>
+      <button id="closeSavedBtn" class="btn-close">✕</button>
+    </div>
+    <div id="savedListContainer"></div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="brand">فيداس — نظام إصدار الفواتير</div>
+  <div class="meta">المستخدم الحالي: <span id="currentUserLabel">—</span></div>
+</div>
+
+<div class="page">
+  <section>
+    <div class="panel">
+      <div class="panel-header">بيانات الفاتورة</div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="field">
+            <label for="custNum">رقم العميل</label>
+            <input id="custNum" type="text" placeholder="أدخل رقم العميل" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="invNum">رقم الفاتورة</label>
+            <input id="invNum" type="text" readonly>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="payMethod">طريقة الدفع</label>
+            <select id="payMethod">
+              <option value="نقدي">نقدي</option>
+              <option value="شبكة">شبكة</option>
+              <option value="بطاقة">بطاقة</option>
+              <option value="آجل">آجل</option>
+            </select>
+          </div>
+          <div class="field"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">الأصناف</div>
+      <div class="panel-body">
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width:40%">الصنف</th>
+              <th style="width:12%">الكمية</th>
+              <th style="width:20%">السعر</th>
+              <th style="width:20%">الإجمالي</th>
+              <th style="width:8%"></th>
+            </tr>
+          </thead>
+          <tbody id="items"></tbody>
+        </table>
+
+        <button class="btn btn-add" id="addItem">+ إضافة صنف</button>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="saveBtn">حفظ الفاتورة تلقائياً</button>
+          <button class="btn" id="printBtn">طباعة</button>
+          <button class="btn" id="viewSavedBtn">عرض الفواتير المحفوظة</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="receipt-wrap">
+    <div class="receipt" id="receipt">
+      <div class="store">فيداس</div>
+      <div class="store-sub">VIDAS</div>
+      <hr>
+      <div class="meta"><span class="label">التاريخ:</span><span class="num" id="rDate"></span></div>
+      <div class="meta"><span class="label">الوقت:</span><span class="num" id="rTime"></span></div>
+      <div class="meta"><span class="label">رقم الفاتورة:</span><span class="num" id="rInv"></span></div>
+      <div class="meta"><span class="label">طريقة الدفع:</span><span id="rPay"></span></div>
+      <div class="meta"><span class="label">طُبعت بواسطة:</span><span id="rUser">—</span></div>
+      <div class="cust">رقم العميل: <span class="num" id="rCust">—</span></div>
+      <hr>
+      <div class="col-head"><span>الصنف</span><span>الكمية&nbsp;&nbsp;&nbsp;السعر</span></div>
+      <div id="rLines"></div>
+      <div class="totals">
+        <div class="row"><span>الإجمالي (شامل الضريبة)</span><span class="num" id="rTotal"></span></div>
+        <div class="row"><span>الضريبة (15%)</span><span class="num" id="rVat"></span></div>
+        <div class="row grand"><span>المجموع الفرعي</span><span class="num" id="rSub"></span></div>
+      </div>
+      <hr>
+      <div class="foot">
+        شكراً لتعاملكم مع فيداس<br>
+        البضاعة المباعة لا تُرد بعد مرور يوم ولا تُستبدل بعد 3 أيام
+      </div>
+      <div class="barcode" id="rBar"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="footer">© فيداس — جميع الحقوق محفوظة</div>
+<script src="script.js"></script>
+</body>
+</html>
